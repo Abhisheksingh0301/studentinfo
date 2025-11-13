@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block title %}Student Information system{% endblock %}
+
+{% block content %}
+
+<div class="flex justify-between items-center mb-8 print:hidden">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p class="text-gray-600 mt-2">Student Information system</p>
+    </div>
+</div>
+
+<!-- Stats Card -->
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <form method="POST">
+        <div class="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-4 md:space-y-0 print:hidden">
+
+            <!-- Session Dropdown -->
+            <div class="flex-1 flex flex-col">
+                <label for="sessn" class="text-sm font-medium text-gray-600 mb-1">Session</label>
+                <select name="sessn" id="sessn"
+                    class="border border-gray-300 rounded-md p-2 text-gray-700 shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="" disabled {% if not selected_sessn %}selected{% endif %}>-- Select Session --
+                    </option>
+                    {% for s in Sessn %}
+                    <option value="{{ s }}" {% if selected_sessn==s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Department Dropdown -->
+            <div class="flex-1 flex flex-col">
+                <label for="dept" class="text-sm font-medium text-gray-600 mb-1">Dept</label>
+                <select name="dept" id="dept"
+                    class="border border-gray-300 rounded-md p-2 text-gray-700 shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="" disabled {% if not selected_dept %}selected{% endif %}>-- Select Department --
+                    </option>
+                    {% for d in Dept %}
+                    <option value="{{ d }}" {% if selected_dept==d %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Roll Input -->
+            <div class="flex-1 flex flex-col">
+                <label for="roll" class="text-sm font-medium text-gray-600 mb-1">Roll</label>
+                <input type="text" id="roll" name="roll" placeholder="Enter roll" required autocomplete="off"
+                    class="border border-gray-300 rounded-md p-2 shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value="{{ roll if roll }}">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex-1 flex flex-col justify-end">
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white py-2 px-4 mt-6 rounded-md shadow hover:bg-blue-700 transition">
+                    Submit
+                </button>
+            </div>
+
+        </div>
+    </form>
+    {% if records %}
+    <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+        <hr class="border-t-2 border-gray-300 my-6">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-600 text-center hover:underline hover hover:text-gray-800">
+            Provisional Marksheet</h2>
+        <div class="bg-stone-100 font-mono text-xl border border-cyan-200">
+            <div
+                class="flex sm:flex-row flex-col justify-between md:items-center md:space-x-6 space-y-4 md:space-y-0 my-4 mx-2">
+                <div> Name : {{ name }}</div>
+                <div> Regd no : {{ regdno }}</div>
+                <div> Year : {{ yr }}</div>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-300 text-sm text-center">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-1 px-4 border">Semester</th>
+                        <th class="py-1 px-4 border">Subject</th>
+                        <th class="py-1 px-4 border">CA</th>
+                        <th class="py-1 px-4 border">Weightage</th>
+                        <th class="py-1 px-4 border">Plus</th>
+                        <th class="py-1 px-4 border">Total</th>
+                        <th class="py-1 px-4 border">Result</th>
+                        <th class="py-1 px-4 border">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in records %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-1 px-4 border">{{ row.Sem }}</td>
+                        <td class="py-1 px-4 border">{{ row.Subject }}</td>
+                        <td class="py-1 px-4 border">{{ row.CA|fmt }}</td>
+                        <td class="py-1 px-4 border">{{ row.WTG|fmt }}</td>
+                        <td class="py-1 px-4 border">{{ row.Plus|fmt }}</td>
+                        <td class="py-1 px-4 border">{{ row.Total|fmt }}</td>
+                        <td class="py-1 px-4 border border-black {{ 'text-red-700' if row.Result == 'ARREAR' else 'text-black' }}">{{
+                            row.Result }}</td>
+                        <td class="py-1 px-4 border">{{ row.Remarks }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-stone-100 font-mono text-base border border-amber-200">
+            <div
+                class="flex sm:flex-row flex-col justify-between md:items-center md:space-x-6 space-y-4 md:space-y-0 my-4 mx-2">
+                <div> Pass count : {{ Pass_count }}</div>
+                <div class="text-red-700"> Arrear count : {{ Arr_count }}</div>
+                <div> Total records : {{ Total_records }}</div>
+            </div>
+            <div
+                class="flex sm:flex-row flex-col justify-between md:items-center md:space-x-6 space-y-4 md:space-y-0 mx-2">
+                <div> Total marks : {{Total_mks|fmt}}/{{ full_mks }}</div>
+                <div> % of marks : {{ per_mks }}%</div>
+            </div>
+        </div>
+        <div class="bg-gray-200 text-base text-center border border-amber-200 font-mono">There might be a few
+            inadvertent
+            error.</div>
+    </div>
+    {% elif selected_sessn and selected_dept and roll %}
+    <p class="text-center text-gray-500 mt-6">No records available for this student.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

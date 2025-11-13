@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Student Information System{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='output.css') }}" />
+  <style>
+    /* Custom animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-100%);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .animate-fadeInUp {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .animate-slideIn {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+
+    .main-content {
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .main-content.visible {
+      opacity: 1;
+    }
+
+    .nav-link {
+      transition: transform 0.2s ease, color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      transform: scale(1.1);
+    }
+
+    .social-icon {
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .social-icon:hover {
+      transform: scale(1.2) rotate(5deg);
+    }
+  </style>
+</head>
+
+<body
+  class="flex flex-col min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 text-gray-900 font-sans">
+
+  <!-- Navbar -->
+  <!-- Navbar -->
+  <nav class="bg-gradient-to-r from-indigo-500 to-blue-500 sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto flex items-center justify-between py-4 px-4 sm:px-6">
+      <!-- Logo -->
+      <a href="/"
+        class="flex items-center space-x-2 text-white font-bold text-xl hover:scale-105 transition-transform duration-300">
+        <img src="{{ url_for('static', filename='logo.jfif') }}" alt="Logo"
+          class="h-8 w-8 object-contain rounded-full shadow-md" />
+        <span>Student Information System</span>
+      </a>
+
+      <!-- Hamburger Menu Button (visible on mobile) -->
+      <button id="menu-toggle"
+        class="sm:hidden text-white focus:outline-none hover:bg-blue-700 p-2 rounded-md transition-colors duration-300"
+        aria-label="Toggle navigation">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+
+      <!-- Navigation Links (Row on large screens) -->
+      <div id="nav-links" class="hidden sm:flex sm:flex-row sm:space-x-8 sm:items-center">
+        <a href="/"
+          class="nav-link text-white text-lg font-semibold hover:text-indigo-200 transition-colors duration-300 font-serif animate-fadeInUp">Home</a>
+        <a href="/about"
+          class="nav-link text-white text-lg font-semibold hover:text-indigo-200 transition-colors duration-300 font-serif animate-fadeInUp"
+          style="animation-delay: 0.4s;">About</a>
+
+        {% if session.get('username') %}
+        <!-- Show username and logout if logged in -->
+        <span class="text-lg font-serif font-semibold text-yellow-200 ml-4 animate-fadeInUp"
+          style="animation-delay: 0.5s;">
+          Hello, {{ session.username }}
+        </span>
+        <a href="{{ url_for('main.logout') }}"
+          class="nav-link text-yellow-200 font-serif text-lg font-semibold ml-2 hover:text-indigo-200 animate-fadeInUp"
+          style="animation-delay: 0.6s;">Logout</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Mobile Menu (Column on small screens) -->
+    <div id="mobile-menu" class="hidden sm:hidden bg-gradient-to-r from-indigo-700 to-blue-700 animate-slideIn">
+      <div class="flex flex-col items-center space-y-4 py-4">
+        <a href="/"
+          class="nav-link text-white text-lg font-semibold hover:text-indigo-200 transition-colors duration-300 font-serif">Home</a>
+        <a href="/about"
+          class="nav-link text-white text-lg font-semibold hover:text-indigo-200 transition-colors duration-300 font-serif">About</a>
+
+        {% if session.get('username') %}
+        <span class="font-serif font-semibold text-yellow-200 text-lg mt-2">Hello, {{ session.username }}</span>
+        <a href="{{ url_for('main.logout') }}"
+          class="nav-link text-yellow-200 font-serif font-semibold text-lg  hover:text-indigo-200">Logout</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- Main Content -->
+  <main
+    class="container mx-auto mt-6 sm:mt-10 mb-12 p-4 sm:p-8 bg-white/80 rounded-lg shadow-xl max-w-7xl flex-grow main-content backdrop-blur-md">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white text-center py-6">
+    <p class="mb-2 text-sm sm:text-base">&copy; <span id="current-year">{{ current_year }}</span> A. K. Singh. All
+      rights reserved.</p>
+    <div class="flex justify-center space-x-4 sm:space-x-6">
+      <a href="#" aria-label="Twitter"
+        class="social-icon text-indigo-200 hover:text-white transition-colors duration-300 text-lg sm:text-xl">🐦</a>
+      <a href="#" aria-label="GitHub"
+        class="social-icon text-indigo-200 hover:text-white transition-colors duration-300 text-lg sm:text-xl">🐙</a>
+      <a href="#" aria-label="LinkedIn"
+        class="social-icon text-indigo-200 hover:text-white transition-colors duration-300 text-lg sm:text-xl">🔗</a>
+    </div>
+  </footer>
+
+  <!-- JavaScript for Hamburger Menu and Scroll Animations -->
+  <script>
+    // Hamburger Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Scroll Animation for Main Content
+    const mainContent = document.querySelector('.main-content');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(mainContent);
+
+    // Dynamic Year Update
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+
+</html>
