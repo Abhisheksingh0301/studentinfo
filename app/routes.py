@@ -157,7 +157,8 @@ def index():
                 WHERE STUDENT_MASTER.Sess = ? 
                   AND STUDENT_MASTER.Department = ? 
                   AND STUDENT_MASTER.Roll = ?
-                ORDER BY EXAM_MARKS_ACTUAL.SemCode, EXAM_MARKS_ACTUAL.Subject
+                ORDER BY CAST(SUBSTRING(EXAM_MARKS_ACTUAL.SemCode, 4, LEN(EXAM_MARKS_ACTUAL.SemCode)-3) AS INT),
+                EXAM_MARKS_ACTUAL.Subject;
             ''', (selected_sessn, selected_dept, selected_roll))
 
             records = rows_to_dict_list(cursor)
@@ -232,6 +233,13 @@ def semwise():
         if not df.empty:
             pivot_df = pd.pivot_table(df, values='Total', index='Roll', columns='SemCode', aggfunc='sum', fill_value=0).reset_index()
             pivot_df['Roll'] = pivot_df['Roll'].astype(int)  # convert Roll to numeric
+            # ---- SORT SEMCODE COLUMNS (SEM2, SEM4, SEM10...) ----
+            semester_cols = sorted(
+            [col for col in pivot_df.columns if col != 'Roll'],
+            key=lambda x: int(x.replace('SEM', ''))
+            )
+            pivot_df = pivot_df[['Roll'] + semester_cols]
+            # ------------------------------------------------------
             pivot_df = pivot_df.sort_values('Roll')  
             total_rows = len(pivot_df)
             start = (page-1)*per_page
