@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, Flask, request
+from flask import Blueprint, render_template, Flask, request, send_file
+from io import BytesIO
 from db import get_db
 import pandas as pd
 import pyodbc
@@ -239,6 +240,7 @@ def semwise():
             key=lambda x: int(x.replace('SEM', ''))
             )
             pivot_df = pivot_df[['Roll'] + semester_cols]
+            pivot_df["Total"] = pivot_df[semester_cols].sum(axis=1) # Add Total column
             # ------------------------------------------------------
             pivot_df = pivot_df.sort_values('Roll')  
             total_rows = len(pivot_df)
@@ -263,4 +265,65 @@ def semwise():
         per_page=per_page,
         total_rows=total_rows
     )
+#Export csv file
+@main.route("/export_csv")
+def export_csv():
+    sessn = request.args.get("sessn")
+    dept = request.args.get("dept")
 
+    db = get_db()
+    cursor = db.cursor()
+
+    # Get complete dataset (NOT paginated)
+    cursor.execute('''
+        SELECT Roll, SemCode, Total
+        FROM [Exam].[dbo].[EXAM_MARKS_ACTUAL]
+        WHERE Sess = ? AND Department = ?
+        ORDER BY Roll
+    ''', (sessn, dept))
+    rows = cursor.fetchall()
+
+    if not rows:
+        return "No data to export", 404
+
+    # Create DF
+    df = pd.DataFrame.from_records(rows, columns=[col[0] for col in cursor.description])
+
+    # ========= APPLY SAME PIVOT LOGIC USED IN PAGE =========
+    pivot_df = pd.pivot_table(
+        df,
+        values='Total',
+        index='Roll',
+        columns='SemCode',
+        aggfunc='sum',
+        fill_value=0
+    ).reset_index()
+
+    pivot_df['Roll'] = pivot_df['Roll'].astype(int)
+
+    # Sorting SEM columns numerically (SEM1 < SEM2 < SEM10)
+    semester_cols = sorted(
+        [col for col in pivot_df.columns if col != 'Roll'],
+        key=lambda x: int(x.replace("SEM", "").replace("Sem", ""))
+    )
+
+    pivot_df = pivot_df[['Roll'] + semester_cols]
+
+    pivot_df = pivot_df.sort_values('Roll')
+    pivot_df["Total"] = pivot_df[semester_cols].sum(axis=1)
+    # ========================================================
+
+    # Convert to CSV
+    csv_buffer = BytesIO()
+    csv_bytes = pivot_df.to_csv(index=False).encode("utf-8")
+    csv_buffer.write(csv_bytes)
+    csv_buffer.seek(0)
+
+    filename = f"exam_marks_{sessn}_{dept}.csv"
+
+    return send_file(
+        csv_buffer,
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name=filename
+    )

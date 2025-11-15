@@ -1,28 +1,31 @@
 {% extends "layout.html" %}
 
-{% block title %}Student Information system{% endblock %}
+{% block title %}Student Information System{% endblock %}
 
 {% block content %}
 
+<!-- Header -->
 <div class="flex justify-between items-center mb-8 print:hidden">
     <div>
-        <h1 class="text-3xl font-bold text-gray-900">Semesterwise records</h1>
-        <p class="text-gray-600 mt-2">Student Information system</p>
+        <h1 class="text-3xl font-bold text-gray-900">Semesterwise Records</h1>
+        <p class="text-gray-600 mt-1">Student Information System</p>
+        <a href="/" class="text-indigo-500 text-sm mt-2 inline-block hover:underline">Home page</a>
     </div>
 </div>
 
-<!-- Stats Card -->
-<div class="bg-white p-6 rounded-lg shadow-md">
+<!-- Main Card -->
+<div class="bg-white p-6 rounded-xl shadow">
+
+    <!-- Filter Form -->
     <form method="POST">
-        <div class="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-4 md:space-y-0 print:hidden">
+        <div class="flex flex-col md:flex-row md:items-end md:space-x-6 space-y-4 md:space-y-0 print:hidden">
 
             <!-- Session Dropdown -->
-            <div class="flex-1 flex flex-col">
-                <label for="sessn" class="text-sm font-medium text-gray-600 mb-1">Session</label>
+            <div class="flex-1">
+                <label for="sessn" class="text-sm font-medium text-gray-600 mb-1 block">Session</label>
                 <select name="sessn" id="sessn"
-                    class="border border-gray-300 rounded-md p-2 text-gray-700 shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="" disabled {% if not selected_sessn %}selected{% endif %}>-- Select Session --
-                    </option>
+                    class="border border-gray-300 rounded-md px-3 py-2 text-gray-700 w-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="" disabled {% if not selected_sessn %}selected{% endif %}>-- Select Session --</option>
                     {% for s in Sessn %}
                     <option value="{{ s }}" {% if selected_sessn==s %}selected{% endif %}>{{ s }}</option>
                     {% endfor %}
@@ -30,12 +33,11 @@
             </div>
 
             <!-- Department Dropdown -->
-            <div class="flex-1 flex flex-col">
-                <label for="dept" class="text-sm font-medium text-gray-600 mb-1">Dept</label>
+            <div class="flex-1">
+                <label for="dept" class="text-sm font-medium text-gray-600 mb-1 block">Department</label>
                 <select name="dept" id="dept"
-                    class="border border-gray-300 rounded-md p-2 text-gray-700 shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="" disabled {% if not selected_dept %}selected{% endif %}>-- Select Department --
-                    </option>
+                    class="border border-gray-300 rounded-md px-3 py-2 text-gray-700 w-full shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="" disabled {% if not selected_dept %}selected{% endif %}>-- Select Department --</option>
                     {% for d in Dept %}
                     <option value="{{ d }}" {% if selected_dept==d %}selected{% endif %}>{{ d }}</option>
                     {% endfor %}
@@ -43,30 +45,46 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="flex-1 flex flex-col justify-end">
+            <div class="flex-1">
                 <button type="submit"
-                    class="w-full bg-blue-600 text-white py-2 px-4 mt-6 rounded-md shadow hover:bg-blue-700 transition">
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow hover:bg-blue-700 transition">
                     Submit
                 </button>
             </div>
 
         </div>
     </form>
-    <div class="w-full max-w-6xl mt-4 rounded-lg shadow-md">
-        {% if table is not none and not table.empty %}
-        <hr class="border-t-2 border-gray-300 my-6">
-        <h1 class="text-3xl font-bold text-gray-600 hover:text-gray-800 mt-16 text-center">
+
+    <!-- Results Section -->
+    <div class="mt-8">
+
+        {% if table %}
+        <hr class="border-gray-300 my-6">
+
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-gray-700 text-center mb-1">
             Exam Marks Pivot Report
         </h1>
-        <h2 class="text-lg text-gray-600 mb-8 text-center">
-            Session: {{ selected_sessn }} • Department: {{ selected_dept }}
-        </h2>
-        <div class="overflow-x-auto bg-white rounded-lg shadow">
-            <table class="min-w-full text-sm text-left text-gray-700 border-collapse">
-                <thead class="bg-gray-100 text-gray-800 uppercase text-xs tracking-wider">
+        <p class="text-gray-500 text-center mb-6">
+            Session: <span class="font-semibold">{{ selected_sessn }}</span> •
+            Department: <span class="font-semibold">{{ selected_dept }}</span>
+        </p>
+
+        <!-- CSV Export Button -->
+        <div class="flex justify-end mb-3 print:hidden">
+            <a href="{{ url_for('main.export_csv', sessn=selected_sessn, dept=selected_dept) }}"
+               class="bg-green-600 text-white py-2 px-4 rounded shadow hover:bg-green-700 transition">
+                Export CSV
+            </a>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto rounded-lg shadow">
+            <table class="min-w-full text-sm text-left text-gray-800 border-collapse">
+                <thead class="bg-gray-100 uppercase text-xs tracking-wider border-b">
                     <tr>
                         {% for col in columns %}
-                        <th class="px-4 py-3 border-b border-gray-300 text-center">{{ col }}</th>
+                        <th class="px-4 py-3 text-center font-semibold">{{ col }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
@@ -74,7 +92,7 @@
                     {% for row in table %}
                     <tr class="hover:bg-gray-50 even:bg-gray-50">
                         {% for col in columns %}
-                        <td class="px-4 py-2 border-b border-gray-200 text-center">{{ row[col] | fmt }}</td>
+                        <td class="px-4 py-2 border-b text-center">{{ row[col] | fmt }}</td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
@@ -83,21 +101,30 @@
         </div>
 
         <!-- Pagination -->
-        <div class="mt-4 flex justify-center space-x-4">
+        <div class="mt-6 flex justify-center space-x-4 print:hidden">
             {% set total_pages = (total_rows // per_page) + (1 if total_rows % per_page > 0 else 0) %}
+
             {% if page > 1 %}
             <a href="{{ url_for('main.semwise', page=page-1, sessn=selected_sessn, dept=selected_dept) }}"
-                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Previous</a>
+                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
+                Previous
+            </a>
             {% endif %}
-            <span class="px-4 py-2">Page {{ page }} of {{ total_pages }}</span>
-            {% if page < total_pages %} <a
-                href="{{ url_for('main.semwise', page=page+1, sessn=selected_sessn, dept=selected_dept) }}"
-                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Next</a>
-                {% endif %}
 
+            <span class="px-4 py-2 text-gray-700 font-medium">
+                Page {{ page }} of {{ total_pages }}
+            </span>
+
+            {% if page < total_pages %}
+            <a href="{{ url_for('main.semwise', page=page+1, sessn=selected_sessn, dept=selected_dept) }}"
+                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
+                Next
+            </a>
+            {% endif %}
         </div>
+
         {% else %}
-        <p class="text-center text-gray-500 mt-4">No data to display.</p>
+        <p class="text-center text-gray-500 mt-6">No data to display.</p>
         {% endif %}
 
     </div>
