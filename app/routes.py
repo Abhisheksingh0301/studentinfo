@@ -224,7 +224,7 @@ def semwise():
     if selected_sessn and selected_dept:
         cursor.execute('''
             SELECT Roll, SemCode, Total
-            FROM [Exam].[dbo].[EXAM_MARKS_ACTUAL]
+            FROM EXAM_MARKS_ACTUAL
             WHERE Sess = ? AND Department = ?
             ORDER BY Roll
         ''', (selected_sessn, selected_dept))
@@ -277,7 +277,7 @@ def export_csv():
     # Get complete dataset (NOT paginated)
     cursor.execute('''
         SELECT Roll, SemCode, Total
-        FROM [Exam].[dbo].[EXAM_MARKS_ACTUAL]
+        FROM EXAM_MARKS_ACTUAL
         WHERE Sess = ? AND Department = ?
         ORDER BY Roll
     ''', (sessn, dept))
