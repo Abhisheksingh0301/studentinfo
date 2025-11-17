@@ -1,44 +1,221 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
 
-{% block title %}About{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Singh Brothers</title>
+    <meta name="description"
+        content="Made with love by the Singh Brothers – two full-stack developers turning ideas into awesome apps.">
 
-{% block content %}
-<div class="bg-cover bg-center min-h-screen"
-     style="background-image: url('{{ url_for('static', filename='aboutbackground.jpg') }}')">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
 
-    <div class="flex flex-col min-h-[66.67%] justify-center items-center m-auto">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @layer utilities {
+            .animated-bg {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+                background-size: 400% 400%;
+                animation: gradientShift 20s ease infinite;
+            }
+
+            @keyframes gradientShift {
+                0% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translate(0, 0) rotate(0deg);
+                }
+
+                33% {
+                    transform: translate(30px, -50px) rotate(2deg);
+                }
+
+                66% {
+                    transform: translate(-40px, 40px) rotate(-2deg);
+                }
+            }
+        }
+    </style>
+
+    <!-- Auto-detect & apply saved theme -->
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        }
+    </script>
+</head>
+
+<body
+    class="animated-bg dark:bg-gradient-to-br dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 min-h-screen relative transition-colors duration-500">
+
+    <!-- Floating Blobs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div
-            class="sm:bg-orange-200 bg-pink-200 text-4xl w-full sm:w-[80%] mx-4 py-3 text-center opacity-90 text-green-900 rounded-t">
-            About page
+            class="absolute w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-float top-0 left-0">
         </div>
-
-        <div
-            class="w-full sm:w-[80%] md:py-[70px] flex opacity-90 md:flex-row flex-col bg-zinc-100 min-h-[40%] items-center rounded-lg">
-            
-            <div class="basis-[65%] m-8">
-                <div class="font-serif text-4xl text-teal-950">I am a designer.</div>
-                <div class="font-serif text-xl text-teal-800">
-                    This website is developed by Flask, HTML5 & Tailwind CSS only.
-                </div>
-                <div class="font-serif text-xl text-teal-800 mt-2">
-                    We manage {{ product_count }} products in our inventory.
-                </div>
-                <div class="mt-6"></div>
-                <ul>
-                    <li class="font-serif text-xl text-orange-800 sm:text-3xl">Abhishek Kumar Singh</li>
-                    <li class="font-serif text-xl sm:text-xl text-sky-700">
-                        <a href="https://www.facebook.com/iamabhishekkumarsingh" target="_blank">
-                            View profile.
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="basis-[35%] pb-5 overflow-hidden px-10">
-                <img src="{{ url_for('static', filename='aboutpage.jpg') }}" alt="Profile image"
-                     class="w-64 h-64 md:h-80 md:w-80">
-            </div>
-        </div>
+        <div class="absolute w-80 h-80 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-float bottom-10 right-0"
+            style="animation-delay: 4s;"></div>
+        <div class="absolute w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-float top-40 left-1/4"
+            style="animation-delay: 8s;"></div>
+        <div class="absolute w-96 h-96 bg-teal-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-float bottom-20 left-1/3"
+            style="animation-delay: 12s;"></div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Dark Mode Toggle -->
+    <button id="theme-toggle"
+        class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white/20 dark:bg-black/30 backdrop-blur-md shadow-lg hover:scale-110 transition">
+        <svg id="sun" class="w-7 h-7 text-yellow-400 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+            <path
+                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-3.05-.707a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM7 11a1 1 0 100-2H6a1 1 0 000 2h1z" />
+        </svg>
+        <svg id="moon" class="w-7 h-7 text-indigo-300 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+        </svg>
+    </button>
+
+    <!-- Main Content -->
+    <div class="relative z-10 flex flex-col min-h-screen">
+        <div class="flex-1 flex items-center justify-center py-12 px-4">
+            <div class="w-full max-w-5xl">
+                <div
+                    class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+
+                    <!-- Hero -->
+                    <div
+                        class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-800 dark:via-purple-800 dark:to-pink-800 p-10 md:p-16 text-white text-center">
+                        <h1 class="text-5xl md:text-7xl font-bold font-display tracking-tight">The Singh Brothers</h1>
+                        <p class="text-2xl md:text-3xl mt-4 opacity-95">Two brothers. One vision. Infinite
+                            possibilities.</p>
+                        <p class="mt-6 text-lg md:text-xl max-w-3xl mx-auto opacity-90">
+                            We’re a power duo who turned late-night chai sessions and crazy ideas into real apps that
+                            people love.
+                        </p>
+                    </div>
+
+                    <div class="p-10 md:p-14 space-y-16 text-gray-800 dark:text-gray-100">
+
+                        <!-- Our Story -->
+                        <section class="text-center">
+                            <h2 class="text-4xl font-bold mb-8 flex items-center justify-center gap-4">
+                                <span class="w-12 h-1 bg-gradient-to-r from-indigo-500 to-pink-500 rounded"></span>
+                                Our Story
+                                <span class="w-12 h-1 bg-gradient-to-r from-indigo-500 to-pink-500 rounded"></span>
+                            </h2>
+                            <p class="text-lg leading-relaxed max-w-4xl mx-auto">
+                                From debugging at 3 AM to celebrating every win with high-fives — this app is the result
+                                of passion, arguments, laughter, and a promise to never settle for “good enough”.
+                            </p>
+                        </section>
+
+                        <!-- The Team -->
+                        <section class="grid md:grid-cols-2 gap-12 items-center">
+                            <div class="text-center">
+                                <img src="https://via.placeholder.com/300" alt="Abhishek Kumar Singh"
+                                    class="w-64 h-64 rounded-3xl object-cover mx-auto shadow-2xl border-8 border-indigo-500">
+                                <h3 class="text-3xl font-bold mt-8">Abhishek Kumar Singh</h3>
+                                <p
+                                    class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mt-2">
+                                    The Singh Brothers</p>
+                                <p class="mt-4">Backend • Node.js • Django • Flask • Databases</p>
+                            </div>
+                            <div class="text-center">
+                                <img src="https://via.placeholder.com/300" alt="Abhijeet Kumar Singh"
+                                    class="w-64 h-64 rounded-3xl object-cover mx-auto shadow-2xl border-8 border-pink-500">
+                                <h3 class="text-3xl font-bold mt-8">Abhijeet Kumar Singh</h3>
+                                <p
+                                    class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mt-2">
+                                    The Singh Brothers</p>
+                                <p class="mt-4">Frontend • React • Tailwind • UI/UX Magic</p>
+                            </div>
+                        </section>
+
+                        <!-- Why We Build -->
+                        <section
+                            class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-3xl p-10 text-center">
+                            <h2 class="text-3xl font-bold mb-6">Why We Build</h2>
+                            <p class="text-lg leading-relaxed max-w-3xl mx-auto">
+                                Great software should feel effortless. Every line of code and every pixel is crafted to
+                                make your day smoother, better, and maybe even fun.
+                            </p>
+                        </section>
+
+                        <!-- Tech Stack -->
+                        <section class="text-center">
+                            <h2 class="text-3xl font-bold mb-8">Built With Love &amp;</h2>
+                            <div class="flex flex-wrap justify-center gap-5 max-w-5xl mx-auto">
+                                <span
+                                    class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-bold px-6 py-3 rounded-full">Node.js</span>
+                                <span
+                                    class="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 font-bold px-6 py-3 rounded-full">React</span>
+                                <span
+                                    class="bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 font-bold px-6 py-3 rounded-full">Tailwind
+                                    CSS</span>
+                                <span
+                                    class="bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 font-bold px-6 py-3 rounded-full">MongoDB</span>
+                                <span
+                                    class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 font-bold px-6 py-3 rounded-full">Django</span>
+                                <span
+                                    class="bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-300 font-bold px-6 py-3 rounded-full border border-cyan-300 dark:border-cyan-700">SQL
+                                    Server</span>
+                                <span
+                                    class="bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300 font-bold px-6 py-3 rounded-full border border-emerald-300 dark:border-emerald-700">MySQL</span>
+                                <span
+                                    class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300 font-bold px-6 py-3 rounded-full border border-amber-300 dark:border-amber-700">SQLite3</span>
+                                <span
+                                    class="bg-gradient-to-r from-indigo-200 to-pink-200 dark:from-indigo-800 dark:to-pink-800 font-bold px-8 py-3 rounded-full">Brotherhood
+                                    ❤️</span>
+                            </div>
+                        </section>
+
+                        <!-- Closing -->
+                        <div class="text-center py-12 border-t-2 border-dashed border-gray-300 dark:border-gray-700">
+                            <p class="text-3xl font-bold">Made with ❤️ by the Singh Brothers</p>
+                            <p class="mt-4 text-lg">Keep supporting us — we’re just getting started!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="h-24"></div>
+    </div>
+
+    <!-- Dark Mode Toggle Script -->
+    <script>
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        });
+    </script>
+</body>
+
+</html>
