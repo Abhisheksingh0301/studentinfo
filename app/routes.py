@@ -193,6 +193,14 @@ def format_number(value):
 @main.route('/about')
 def about():
     return render_template('about.html')
+#Register page
+@main.route('/register')
+def register():
+    return render_template('register.html')
+#Login page
+@main.route('/login')
+def login():
+    return render_template('login.html')
 
 
 #Pivot report
