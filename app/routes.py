@@ -262,6 +262,13 @@ def login():
         ).fetchone()
 
         if user and check_password_hash(user["password"], request.form["password"]):
+            # ✅ Update lastlogin timestamp
+            db.execute(
+                "UPDATE users SET lastlogin = datetime('now', 'localtime') WHERE id = ?",
+                (user["id"],)
+            )
+            db.commit()
+
             session["user_id"] = user["id"]
             session["username"] = user["username"]
             return redirect(url_for("main.index"))
@@ -269,6 +276,7 @@ def login():
         flash("Invalid credentials")
 
     return render_template("login.html")
+
 #Logout
 @main.route("/logout")
 def logout():
