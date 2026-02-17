@@ -1,10 +1,30 @@
-from flask import Blueprint, render_template, Flask, request, send_file
+from flask import Blueprint, render_template, Flask, request, send_file, flash
 from io import BytesIO
 from db import get_db
 import pandas as pd
 import pyodbc
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from auth_db import get_auth_db
 
 main = Blueprint('main', __name__)
+
+
+
+from functools import wraps
+from flask import session, redirect, url_for
+
+# ---------------------------
+# Login Required Decorator
+# ---------------------------
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if "user_id" not in session:  # user not logged in
+            return redirect(url_for("main.login"))
+        return f(*args, **kwargs)
+    return decorated
+
 
 def rows_to_dict_list(cursor):
     """Convert pyodbc cursor results to list of dicts."""
@@ -12,6 +32,7 @@ def rows_to_dict_list(cursor):
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 @main.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
     db = get_db()
     cursor = db.cursor()
@@ -194,17 +215,71 @@ def format_number(value):
 def about():
     return render_template('about.html')
 #Register page
-@main.route('/register')
+from werkzeug.security import generate_password_hash
+from flask import request, redirect, url_for, render_template, flash, session
+from auth_db import get_auth_db
+
+@main.route("/register", methods=["GET", "POST"])
 def register():
-    return render_template('register.html')
+    if request.method == "POST":
+        db = get_auth_db()
+        username = request.form["username"]
+        password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
+
+        # ✅ Check if password and confirm password match
+        if password != confirm_password:
+            flash("Passwords do not match!", "error")
+            return render_template("register.html")
+
+        # ✅ Hash the password
+        hashed_password = generate_password_hash(password)
+
+        try:
+            # ✅ Insert user into SQLite auth database
+            db.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                (username, hashed_password)
+            )
+            db.commit()
+            flash("Account created successfully! You can now login.", "success")
+            return redirect(url_for("main.login"))
+        except Exception as e:
+            # Handle duplicate username or other DB errors
+            flash("Username already exists or error occurred.", "error")
+            print("Registration error:", e)
+
+    return render_template("register.html")
+
 #Login page
-@main.route('/login')
+@main.route("/login", methods=["GET", "POST"])
 def login():
-    return render_template('login.html')
+    if request.method == "POST":
+        db = get_auth_db()
+        user = db.execute(
+            "SELECT * FROM users WHERE username = ?",
+            (request.form["username"],)
+        ).fetchone()
+
+        if user and check_password_hash(user["password"], request.form["password"]):
+            session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            return redirect(url_for("main.index"))
+
+        flash("Invalid credentials")
+
+    return render_template("login.html")
+#Logout
+@main.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("main.login"))
+
 
 
 #Pivot report
 @main.route('/semwise', methods=['GET', 'POST'])
+@login_required
 def semwise():
     # Get filters from POST or GET
     selected_sessn = request.form.get('sessn') or request.args.get('sessn')
