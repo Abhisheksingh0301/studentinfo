@@ -168,6 +168,8 @@ def index():
                     EXAM_MARKS_ACTUAL.PLUS AS Plus, 
                     EXAM_MARKS_ACTUAL.TOTAL AS Total, 
                     EXAM_MARKS_ACTUAL.PASS AS Result, 
+                    EXAM_MARKS_ACTUAL.CREDIT AS Credit, 
+                    EXAM_MARKS_ACTUAL.GrdPoint AS GrdPoint,
                     EXAM_MARKS_ACTUAL.Remarks
                 FROM EXAM_MARKS_ACTUAL 
                 INNER JOIN STUDENT_MASTER 
